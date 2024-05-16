@@ -13,6 +13,7 @@ import cv2
 import numpy as np
 import torch
 from kornia.color import grayscale_to_rgb
+from kornia.core import Device
 from torch import nn
 
 from .unet import Unet
@@ -136,9 +137,9 @@ class FlexibleDISK(nn.Module):
 
         return heatmaps, descriptors
 
-    def load(self, path: str = MODELS_PATH) -> None:
+    def load(self, path: str = MODELS_PATH, device: Device = torch.device("cpu")) -> None:
         loader = smart_loader(path)
-        model = loader(path if "http" in path else f"{path}/{self.__class__.__name__}.pth")
+        model = loader(path if "http" in path else f"{path}/{self.__class__.__name__}.pth", map_location=device)
 
         self.load_state_dict(model["extractor"])
 
