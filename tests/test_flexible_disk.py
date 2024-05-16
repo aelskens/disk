@@ -42,7 +42,7 @@ def test_coherence_with_disk(img, expected) -> None:
     model.load("https://raw.githubusercontent.com/cvlab-epfl/disk/master/depth-save.pth")
 
     assert _compare(
-        list(model(numpy_image_to_torch(img))),
+        list(model(numpy_image_to_torch(img), detection=True, description=True)),
         [i for i in (expected[0].keypoints, expected[0].detection_scores, expected[0].descriptors)],
     )
 
