@@ -16,7 +16,7 @@ from setuptools import find_packages, setup, Command
 # Package meta-data.
 NAME = 'disk'
 DESCRIPTION = 'A more flexible implementation of DISK.'
-# URL = 'https://github.com/me/myproject'
+URL = "https://github.com/aelskens/disk"
 EMAIL = 'arthur.elskens@ulb.be'
 AUTHOR = 'Arthur Elskens'
 REQUIRES_PYTHON = '>=3.10.12'
@@ -243,7 +243,7 @@ setup(
     author=AUTHOR,
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
-    # url=URL,
+    url=URL,
     packages=find_packages("src", exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     package_dir={"": "src"},
     install_requires=required,
@@ -265,8 +265,8 @@ setup(
         "custom_build": CustomBuildCommand,
         "upload": UploadCommand,
     },
-    # project_urls={
-    #     "GitHub": URL,
-    #     "Tracker": os.path.join(URL, "issues"),
-    # },
+    project_urls={
+        "GitHub": URL,
+        "Tracker": os.path.join(URL, "issues"),
+    },
 )
