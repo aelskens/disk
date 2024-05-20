@@ -107,13 +107,13 @@ class FlexibleDISK(nn.Module):
         if description:
             assert features is not None
             # Again due to batch dimension -> take the first because just one in inference
-            descriptors = features.merge_with_descriptors(descriptors[0]).descriptors
+            tmp = features.merge_with_descriptors(descriptors[0])
+            keypoints, scores, descriptors = tmp.keypoints, tmp.detection_scores, tmp.descriptors
+        else:
+            keypoints = features.xys.to(descriptors.dtype) if features else None
+            scores = features.detection_logp if features else None
 
-        return (
-            features.xys.to(descriptors.dtype) if features else None,
-            features.detection_logp if features else None,
-            descriptors,
-        )
+        return keypoints, scores, descriptors
 
     def heatmap_and_dense_descriptors(self, images: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Returns the heatmap and the dense descriptors.
@@ -181,11 +181,15 @@ class FlexibleDISK(nn.Module):
         # Expected input: torch.tensor(shape=(n_kp, 2))
         tf_keypoints = torch.stack([torch.tensor(kp.pt) for kp in keypoints])
 
-        _, _, descriptors = self.forward(tf_img, tf_keypoints, description=True)
+        new_keypoints, scores, descriptors = self.forward(tf_img, tf_keypoints, description=True)
 
-        assert descriptors is not None
+        assert new_keypoints is not None and scores is not None and descriptors is not None
 
-        return keypoints, remove_batch_dimension(descriptors).numpy(force=True)
+        tmp = []
+        for kp, score in zip(remove_batch_dimension(new_keypoints), remove_batch_dimension(scores)):
+            tmp.append(cv2.KeyPoint(x=kp[0].item(), y=kp[1].item(), size=1.0, response=score.item()))
+
+        return tuple(tmp), remove_batch_dimension(descriptors).numpy(force=True)
 
     @torch.no_grad()
     def detectAndCompute(self, img: np.ndarray) -> tuple[Sequence[cv2.KeyPoint], np.ndarray]:
