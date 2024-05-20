@@ -86,7 +86,7 @@ class Keypoints:
 
         xys = []
         scores = []
-        for xy, score in zip(self.xys, self.detection_logp):
+        for xy, score in zip(torch.round(self.xys).to(torch.int), self.detection_logp):
             if xy[0] <= dims[0] and xy[1] <= dims[1]:
                 xys.append(xy)
                 scores.append(score)
@@ -104,7 +104,7 @@ class Keypoints:
 
         x, y = self.xys.T
 
-        desc = descriptors[:, torch.round(y).to(torch.int), torch.round(x).to(torch.int)].T
+        desc = descriptors[:, y, x].T
         desc = F.normalize(desc, dim=-1)
 
         return DISKFeatures(self.xys.to(dtype), desc, self.detection_logp)
