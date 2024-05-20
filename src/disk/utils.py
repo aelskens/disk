@@ -87,7 +87,7 @@ class Keypoints:
         xys = []
         scores = []
         for xy, score in zip(torch.round(self.xys).to(torch.int), self.detection_logp):
-            if xy[0] <= dims[0] and xy[1] <= dims[1]:
+            if xy[0] < dims[0] and xy[1] < dims[1]:
                 xys.append(xy)
                 scores.append(score)
 
