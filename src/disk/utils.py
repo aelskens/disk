@@ -77,10 +77,31 @@ class Keypoints:
     xys: torch.Tensor
     detection_logp: torch.Tensor
 
+    def _remove_out_of_bounds_xys(self, dims: tuple[int, int]) -> None:
+        """Remove out-of-bounds xy and update the scores as well.
+
+        :param dims: The maximum dimensions, given as (x, y).
+        :type dims: tuple[int, int]
+        """
+
+        xys = []
+        scores = []
+        for xy, score in zip(self.xys, self.detection_logp):
+            if xy[0] <= dims[0] and xy[1] <= dims[1]:
+                xys.append(xy)
+                scores.append(score)
+
+        self.xys = torch.stack(xys)
+        self.detection_logp = torch.stack(scores)
+
     def merge_with_descriptors(self, descriptors: torch.Tensor) -> DISKFeatures:
         """Select descriptors from a dense `descriptors` tensor, at locations given by `self.xys`"""
 
         dtype = descriptors.dtype
+
+        # Remove out-of-bounds xy
+        self._remove_out_of_bounds_xys((descriptors.shape[-1], descriptors.shape[-2]))
+
         x, y = self.xys.T
 
         desc = descriptors[:, torch.round(y).to(torch.int), torch.round(x).to(torch.int)].T
