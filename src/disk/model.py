@@ -114,7 +114,8 @@ class FlexibleDISK(nn.Module):
             scores = features.detection_logp if features else None
 
         return keypoints, scores, descriptors
-
+    
+    @torch.inference_mode()
     def heatmap_and_dense_descriptors(self, images: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Returns the heatmap and the dense descriptors.
 
@@ -143,7 +144,7 @@ class FlexibleDISK(nn.Module):
 
         self.load_state_dict(model["extractor"])
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def detect(self, img: np.ndarray) -> Sequence[cv2.KeyPoint]:
         """Implementation of OpenCV's Feature2D `detect()` method.
 
@@ -163,7 +164,7 @@ class FlexibleDISK(nn.Module):
 
         return tuple(tmp)
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def compute(self, img: np.ndarray, keypoints: Sequence[cv2.KeyPoint]) -> tuple[Sequence[cv2.KeyPoint], np.ndarray]:
         """Implementation of OpenCV's Feature2D `detect()` method.
 
@@ -191,7 +192,7 @@ class FlexibleDISK(nn.Module):
 
         return tuple(tmp), remove_batch_dimension(descriptors).numpy(force=True)
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def detectAndCompute(self, img: np.ndarray) -> tuple[Sequence[cv2.KeyPoint], np.ndarray]:
         """Implementation of OpenCV's Feature2D `detect()` method.
 
