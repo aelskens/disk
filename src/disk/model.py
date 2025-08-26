@@ -114,7 +114,7 @@ class FlexibleDISK(nn.Module):
             scores = features.detection_logp if features else None
 
         return keypoints, scores, descriptors
-    
+
     @torch.inference_mode()
     def heatmap_and_dense_descriptors(self, images: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Returns the heatmap and the dense descriptors.
@@ -140,7 +140,7 @@ class FlexibleDISK(nn.Module):
 
     def load(self, path: str = MODELS_PATH, device: Device = torch.device("cpu")) -> None:
         loader = smart_loader(path)
-        model = loader(path if "http" in path else f"{path}/{self.__class__.__name__}.pth", map_location=device)
+        model = loader(path, map_location=device)
 
         self.load_state_dict(model["extractor"])
 
