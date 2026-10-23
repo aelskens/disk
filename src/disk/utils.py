@@ -10,7 +10,6 @@ from typing import Any, Callable, Optional
 import numpy as np
 import torch
 import torch.nn.functional as F
-from kornia.core import Device
 from torchvision import transforms
 
 
@@ -36,7 +35,7 @@ class DISKFeatures:
         return self.keypoints.shape[0]
 
     @property
-    def device(self) -> Device:
+    def device(self) -> torch.device:
         return self.keypoints.device
 
     @property
